@@ -1,98 +1,46 @@
-<<<<<<< HEAD
-=======
-HELP.md
->>>>>>> d2b52a3950b93fc73a7020ef6427377c39e3d73e
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-
-<<<<<<< HEAD
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
-*.iws
-*.iml
-*.ipr
-
-### Eclipse ###
-=======
-### STS ###
->>>>>>> d2b52a3950b93fc73a7020ef6427377c39e3d73e
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-<<<<<<< HEAD
-=======
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-
->>>>>>> d2b52a3950b93fc73a7020ef6427377c39e3d73e
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### VS Code ###
-.vscode/
-<<<<<<< HEAD
-
-### Mac OS ###
-.DS_Store
-
-*.xml
-.idea/
-.github/
-
-# Бинарные файлы БД
-db/*.db
-db/*.trace.db
-
+### Java ###
 # Скомпилированные файлы
-*.class
-*.jar
-target/
-bin/
-
-# Системные файлы
-.DS_Store
-*.iml
-.idea/
-=======
->>>>>>> d2b52a3950b93fc73a7020ef6427377c39e3d73e
-
-# Бинарные файлы
 *.class
 *.jar
 *.war
 *.ear
-*.DS_Store
-*.log
 
-# Папки сборки
+# Файлы сборки
 /target/
 /bin/
 /build/
 /logs/
 
-# IDE
+### IDE ###
+# IntelliJ
 .idea/
 *.iml
+*.iws
+*.ipr
+.idea_modules/
 
-# Системные файлы
+# Eclipse
+.classpath
+.project
+.settings/
+.factorypath
+
+# VS Code
+.vscode/
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### Системные файлы ###
+.DS_Store
 Thumbs.db
+*.log
+
+### Исключения ###
+!**/src/main/**/target/
+!**/src/test/**/target/
+!.mvn/wrapper/maven-wrapper.jar
