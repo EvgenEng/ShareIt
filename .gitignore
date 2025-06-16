@@ -79,6 +79,8 @@ bin/
 # Бинарные файлы
 *.class
 *.jar
+*.war
+*.ear
 *.DS_Store
 *.log
 
@@ -87,3 +89,10 @@ bin/
 /bin/
 /build/
 /logs/
+
+# IDE
+.idea/
+*.iml
+
+# Системные файлы
+Thumbs.db
