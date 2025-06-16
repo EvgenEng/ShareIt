@@ -79,6 +79,14 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jvmArguments>-Dspring.main.lazy-initialization=true</jvmArguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
