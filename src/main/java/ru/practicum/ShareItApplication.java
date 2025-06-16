@@ -9,7 +9,3 @@ public class ShareItApplication {
         SpringApplication.run(ShareItApplication.class, args);
     }
 }
-<<<<<<< HEAD
-=======
-//проверка
->>>>>>> d2b52a3950b93fc73a7020ef6427377c39e3d73e
