@@ -75,3 +75,15 @@ bin/
 .idea/
 =======
 >>>>>>> d2b52a3950b93fc73a7020ef6427377c39e3d73e
+
+# Бинарные файлы
+*.class
+*.jar
+*.DS_Store
+*.log
+
+# Папки сборки
+/target/
+/bin/
+/build/
+/logs/
