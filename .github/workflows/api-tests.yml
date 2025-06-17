@@ -4,55 +4,5 @@ on:
   pull_request:
 
 jobs:
-  api-tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Java 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Build with Maven
-        run: ./mvnw clean package -DskipTests
-
-      - name: Start Spring Boot App
-        run: |
-          # Убиваем возможные предыдущие процессы на порту 9090
-          sudo lsof -ti :9090 | xargs -r sudo kill -9 || true
-          
-          # Запускаем приложение на порту 9090 в фоне
-          java -jar target/*.jar --server.port=9090 --server.address=0.0.0.0 > app.log 2>&1 &
-          echo $! > app.pid
-          sleep 5  # Даем время на старт
-          
-          # Логи для дебага
-          echo "=== App logs ==="
-          cat app.log
-          echo "================"
-
-      - name: Wait for application to start
-        run: |
-          for i in {1..10}; do
-            if curl -s http://localhost:9090/actuator/health | grep -q '"status":"UP"'; then
-              echo "Application is up!"
-              exit 0
-            fi
-            echo "Waiting for app to start... (attempt $i/10)"
-            sleep 3
-          done
-          echo "Application failed to start"
-          exit 1
-
-      - name: Run tests
-        run: ./mvnw test
-
-      - name: Stop Spring Boot App
-        if: always()
-        run: |
-          if [ -f app.pid ]; then
-            kill $(cat app.pid) || true
-          fi
+  build:
+    uses: yandex-praktikum/java-shareit/.github/workflows/api-tests.yml@ci
