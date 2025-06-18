@@ -2,6 +2,7 @@ package ru.practicum.item;
 
 import org.springframework.stereotype.Service;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.item.dto.ItemDto;
 import ru.practicum.user.UserService;
 
 import java.util.List;
@@ -19,9 +20,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto create(ItemDto itemDto, Long ownerId) {
-        // Проверяем существование пользователя
         userService.getById(ownerId);
-
         Item item = ItemMapper.toItem(itemDto, ownerId);
         return ItemMapper.toItemDto(itemRepository.save(item));
     }
@@ -35,16 +34,7 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Только владелец может обновлять предмет");
         }
 
-        if (itemDto.getName() != null) {
-            existingItem.setName(itemDto.getName());
-        }
-        if (itemDto.getDescription() != null) {
-            existingItem.setDescription(itemDto.getDescription());
-        }
-        if (itemDto.getAvailable() != null) {
-            existingItem.setAvailable(itemDto.getAvailable());
-        }
-
+        ItemMapper.updateItemFromDto(itemDto, existingItem);
         return ItemMapper.toItemDto(itemRepository.save(existingItem));
     }
 
@@ -57,9 +47,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAllByOwner(Long ownerId) {
-        // Проверяем существование пользователя
         userService.getById(ownerId);
-
         return itemRepository.findAllByOwnerId(ownerId).stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());

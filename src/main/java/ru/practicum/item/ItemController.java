@@ -2,10 +2,10 @@ package ru.practicum.item;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.exception.NotFoundException;
-import ru.practicum.exception.ValidationException;
-
+import ru.practicum.item.dto.ItemDto;
+import ru.practicum.util.HttpHeaders;
 import jakarta.validation.Valid;
+
 import java.util.List;
 
 @RestController
@@ -19,19 +19,13 @@ public class ItemController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemDto create(@RequestHeader("X-Sharer-User-Id") Long ownerId,
+    public ItemDto create(@RequestHeader(HttpHeaders.USER_ID_HEADER) Long ownerId,
                           @Valid @RequestBody ItemDto itemDto) {
-        if (itemDto.getAvailable() == null) {
-            throw new ValidationException("Поле available обязательно");
-        }
-        if (itemDto.getName() == null || itemDto.getName().isBlank()) {
-            throw new ValidationException("Имя не может быть пустым");
-        }
         return itemService.create(itemDto, ownerId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long ownerId,
+    public ItemDto update(@RequestHeader(HttpHeaders.USER_ID_HEADER) Long ownerId,
                           @PathVariable Long itemId,
                           @RequestBody ItemDto itemDto) {
         itemDto.setId(itemId);
@@ -40,32 +34,17 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ItemDto getById(@PathVariable Long itemId,
-                           @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+                           @RequestHeader(HttpHeaders.USER_ID_HEADER) Long ownerId) {
         return itemService.getById(itemId, ownerId);
     }
 
     @GetMapping
-    public List<ItemDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") Long ownerId) {
+    public List<ItemDto> getAllByOwner(@RequestHeader(HttpHeaders.USER_ID_HEADER) Long ownerId) {
         return itemService.getAllByOwner(ownerId);
     }
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text) {
-        if (text.isBlank()) {
-            return List.of();
-        }
-        return itemService.search(text);
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleNotFoundException(NotFoundException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleValidationException(ValidationException e) {
-        return e.getMessage();
+        return text.isBlank() ? List.of() : itemService.search(text);
     }
 }

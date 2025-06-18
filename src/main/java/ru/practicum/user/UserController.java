@@ -7,44 +7,51 @@ import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.ErrorResponse;
 
 import jakarta.validation.Valid;
+import ru.practicum.user.dto.UserDto;
+import ru.practicum.user.dto.UserResponseDto;
+import ru.practicum.user.dto.UserUpdateDto;
+
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public User create(@Valid @RequestBody User user) {
-        return userService.save(user);
+    public UserResponseDto create(@Valid @RequestBody UserDto userDto) {
+        User user = userMapper.toUser(userDto);
+        User createdUser = userService.save(user);
+        return userMapper.toUserResponseDto(createdUser);
     }
 
     @PatchMapping("/{userId}")
     public ResponseEntity<?> updateUser(
             @PathVariable Long userId,
-            @RequestBody Map<String, String> updates) {
+            @Valid @RequestBody UserUpdateDto userUpdateDto) {
 
         User currentUser = userService.getById(userId);
 
-        if (updates.containsKey("name")) {
-            currentUser.setName(updates.get("name"));
+        if (userUpdateDto.getName() != null) {
+            currentUser.setName(userUpdateDto.getName());
         }
 
-        if (updates.containsKey("email")) {
-            currentUser.setEmail(updates.get("email"));
+        if (userUpdateDto.getEmail() != null) {
+            currentUser.setEmail(userUpdateDto.getEmail());
         }
 
         try {
             User updatedUser = userService.update(currentUser);
-            return ResponseEntity.ok(updatedUser);
+            return ResponseEntity.ok(userMapper.toUserResponseDto(updatedUser));
         } catch (ConflictException e) {
-            // Возвращаем статус 409 с сообщением об ошибке
             return ResponseEntity
                     .status(HttpStatus.CONFLICT)
                     .body(new ErrorResponse(e.getMessage()));
@@ -52,13 +59,16 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User getById(@PathVariable Long userId) {
-        return userService.getById(userId);
+    public UserResponseDto getById(@PathVariable Long userId) {
+        User user = userService.getById(userId);
+        return userMapper.toUserResponseDto(user);
     }
 
     @GetMapping
-    public List<User> getAll() {
-        return userService.getAll();
+    public List<UserResponseDto> getAll() {
+        return userService.getAll().stream()
+                .map(userMapper::toUserResponseDto)
+                .collect(Collectors.toList());
     }
 
     @DeleteMapping("/{userId}")

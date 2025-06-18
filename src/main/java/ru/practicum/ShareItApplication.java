@@ -9,4 +9,3 @@ public class ShareItApplication {
         SpringApplication.run(ShareItApplication.class, args);
     }
 }
-//проверка

@@ -1,5 +1,7 @@
 package ru.practicum.item;
 
+import ru.practicum.item.dto.ItemDto;
+
 import java.util.List;
 
 public interface ItemService {

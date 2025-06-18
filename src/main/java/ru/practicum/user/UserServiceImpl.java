@@ -4,22 +4,34 @@ import org.springframework.stereotype.Service;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final Set<String> emailSet = new HashSet<>();
 
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
+        initializeEmailSet();
+    }
+
+    private void initializeEmailSet() {
+        userRepository.findAll().stream()
+                .map(User::getEmail)
+                .forEach(emailSet::add);
     }
 
     @Override
     public User save(User user) {
-        if (userRepository.existsByEmail(user.getEmail())) {
+        if (emailSet.contains(user.getEmail())) {
             throw new ConflictException("Пользователь с таким email уже существует");
         }
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        emailSet.add(savedUser.getEmail());
+        return savedUser;
     }
 
     @Override
@@ -27,17 +39,15 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findById(user.getId())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
-        if (user.getEmail() != null) {
-            userRepository.findByEmail(user.getEmail())
-                    .ifPresent(otherUser -> {
-                        if (!otherUser.getId().equals(user.getId())) {
-                            throw new ConflictException(
-                                    String.format("Email '%s' already used by user %d",
-                                            user.getEmail(), otherUser.getId())
-                            );
-                        }
-                    });
+        if (user.getEmail() != null && !user.getEmail().equals(existingUser.getEmail())) {
+            if (emailSet.contains(user.getEmail())) {
+                throw new ConflictException(
+                        String.format("Email '%s' уже используется другим пользователем", user.getEmail())
+                );
+            }
+            emailSet.remove(existingUser.getEmail());
             existingUser.setEmail(user.getEmail());
+            emailSet.add(user.getEmail());
         }
 
         if (user.getName() != null) {
@@ -60,9 +70,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new NotFoundException("Пользователь не найден");
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        emailSet.remove(user.getEmail());
         userRepository.delete(id);
     }
 }
