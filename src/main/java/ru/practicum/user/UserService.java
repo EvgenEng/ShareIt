@@ -1,16 +1,20 @@
 package ru.practicum.user;
 
+import ru.practicum.user.dto.UserResponseDto;
+import ru.practicum.user.dto.UserDto;
+import ru.practicum.user.dto.UserUpdateDto;
+
 import java.util.List;
 
 public interface UserService {
 
-    User save(User user);
+    UserResponseDto save(UserDto userDto);
 
-    User update(User user);
+    UserResponseDto update(Long userId, UserUpdateDto userUpdateDto);
 
-    User getById(Long id);
+    UserResponseDto getById(Long id);
 
-    List<User> getAll();
+    List<UserResponseDto> getAll();
 
     void delete(Long id);
 }

@@ -1,7 +1,6 @@
 package ru.practicum.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -33,8 +32,8 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ValidationErrorResponse handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        List<Violation> violations = e.getBindingResult().getFieldErrors().stream()
+    public ValidationErrorResponse handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
+        List<Violation> violations = exception.getBindingResult().getFieldErrors().stream()
                 .map(error -> new Violation(error.getField(), error.getDefaultMessage()))
                 .collect(Collectors.toList());
         return new ValidationErrorResponse(violations);
