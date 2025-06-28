@@ -1,6 +1,7 @@
 package ru.practicum.item;
 
 import ru.practicum.item.dto.ItemDto;
+import ru.practicum.user.User;
 
 public class ItemMapper {
     public static ItemDto toItemDto(Item item) {
@@ -13,12 +14,12 @@ public class ItemMapper {
         return itemDto;
     }
 
-    public static Item toItem(ItemDto itemDto, Long ownerId) {
+    public static Item toItem(ItemDto itemDto, User owner) {
         Item item = new Item();
         item.setName(itemDto.getName());
         item.setDescription(itemDto.getDescription());
         item.setAvailable(itemDto.getAvailable());
-        item.setOwnerId(ownerId);
+        item.setOwner(owner);
         item.setRequestId(itemDto.getRequestId());
         return item;
     }

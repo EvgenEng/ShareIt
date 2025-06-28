@@ -1,18 +1,17 @@
-package ru.practicum.request;
+package ru.practicum.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.user.User;
 
 import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemRequest {
+public class CommentDto {
     private Long id;
-    private String description;
-    private User requestor;
+    private String text;
+    private String authorName;
     private LocalDateTime created;
 }

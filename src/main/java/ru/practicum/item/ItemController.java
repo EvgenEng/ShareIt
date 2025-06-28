@@ -2,6 +2,7 @@ package ru.practicum.item;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.item.dto.CommentDto;
 import ru.practicum.item.dto.ItemDto;
 import ru.practicum.util.HttpHeaders;
 import jakarta.validation.Valid;
@@ -46,5 +47,14 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text) {
         return text.isBlank() ? List.of() : itemService.search(text);
+    }
+
+    @PostMapping("/{itemId}/comment")
+    @ResponseStatus(HttpStatus.OK)
+    public CommentDto addComment(
+            @RequestHeader(HttpHeaders.USER_ID_HEADER) Long userId,
+            @PathVariable Long itemId,
+            @Valid @RequestBody CommentDto commentDto) {
+        return itemService.addComment(userId, itemId, commentDto);
     }
 }

@@ -1,24 +1,34 @@
 package ru.practicum.item.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemDto {
     private Long id;
 
-    @NotBlank(message = "Имя не может быть пустым")
-    @Size(max = 255, message = "Имя не должно превышать 255 символов")
+    @NotBlank(message = "Name cannot be blank")
     private String name;
 
-    @NotBlank(message = "Описание не может быть пустым")
-    @Size(max = 1000, message = "Описание не должно превышать 1000 символов")
     private String description;
-
-    @NotNull(message = "Статус доступности (available) обязателен")
     private Boolean available;
-
+    private BookingShort lastBooking;
+    private BookingShort nextBooking;
+    private List<CommentDto> comments = new ArrayList<>();
     private Long requestId;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BookingShort {
+        private Long id;
+        private Long bookerId;
+    }
 }
