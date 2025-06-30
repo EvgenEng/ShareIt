@@ -1,6 +1,8 @@
 package ru.practicum.booking;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import ru.practicum.booking.dto.BookingDto;
 import ru.practicum.booking.dto.BookingResponseDto;
 import ru.practicum.item.Item;

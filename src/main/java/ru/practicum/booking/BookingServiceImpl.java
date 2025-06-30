@@ -6,7 +6,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.booking.dto.BookingDto;
 import ru.practicum.booking.dto.BookingResponseDto;
-import ru.practicum.exception.*;
+import ru.practicum.booking.handler.BookingStateHandler;
+import ru.practicum.booking.handler.BookingStateHandlerChain;
+import ru.practicum.exception.AlreadyProcessedException;
+import ru.practicum.exception.ForbiddenException;
+import ru.practicum.exception.NotFoundException;
+import ru.practicum.exception.UnavailableItemException;
 import ru.practicum.item.Item;
 import ru.practicum.item.ItemRepository;
 import ru.practicum.user.User;
@@ -23,6 +28,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
     private final BookingMapper bookingMapper;
+    private final BookingStateHandlerChain handlerChain;
 
     @Override
     @Transactional
@@ -88,36 +94,8 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         PageRequest page = PageRequest.of(from / size, size);
-        LocalDateTime now = LocalDateTime.now();
-
-        List<Booking> bookings;
-        switch (state) {
-            case "ALL":
-                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId, page);
-                break;
-            case "CURRENT":
-                bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                        userId, now, now, page);
-                break;
-            case "PAST":
-                bookings = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(
-                        userId, now, page);
-                break;
-            case "FUTURE":
-                bookings = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(
-                        userId, now, page);
-                break;
-            case "WAITING":
-                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(
-                        userId, Booking.BookingStatus.WAITING, page);
-                break;
-            case "REJECTED":
-                bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(
-                        userId, Booking.BookingStatus.REJECTED, page);
-                break;
-            default:
-                throw new UnsupportedStatusException("Unknown state: " + state);
-        }
+        BookingStateHandler handler = handlerChain.getHandler(state);
+        List<Booking> bookings = handler.handle(userId, page, LocalDateTime.now());
 
         return bookings.stream()
                 .map(bookingMapper::toResponseDto)
@@ -130,36 +108,8 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         PageRequest page = PageRequest.of(from / size, size);
-        LocalDateTime now = LocalDateTime.now();
-
-        List<Booking> bookings;
-        switch (state) {
-            case "ALL":
-                bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(userId, page);
-                break;
-            case "CURRENT":
-                bookings = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(
-                        userId, now, now, page);
-                break;
-            case "PAST":
-                bookings = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(
-                        userId, now, page);
-                break;
-            case "FUTURE":
-                bookings = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(
-                        userId, now, page);
-                break;
-            case "WAITING":
-                bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(
-                        userId, Booking.BookingStatus.WAITING, page);
-                break;
-            case "REJECTED":
-                bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(
-                        userId, Booking.BookingStatus.REJECTED, page);
-                break;
-            default:
-                throw new UnsupportedStatusException("Unknown state: " + state);
-        }
+        BookingStateHandler handler = handlerChain.getHandler("OWNER_" + state);
+        List<Booking> bookings = handler.handle(userId, page, LocalDateTime.now());
 
         return bookings.stream()
                 .map(bookingMapper::toResponseDto)

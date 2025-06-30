@@ -1,34 +1,27 @@
 package ru.practicum.item;
 
-import org.springframework.stereotype.Component;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import ru.practicum.item.dto.CommentDto;
+import ru.practicum.user.User;
 
-@Component
-public class CommentMapper {
-    public static CommentDto toDto(Comment comment) {
-        if (comment == null) {
+@Mapper(componentModel = "spring")
+public interface CommentMapper {
+
+    @Mapping(target = "authorName", source = "author", qualifiedByName = "mapAuthorName")
+    CommentDto toDto(Comment comment);
+
+    @Mapping(target = "author", ignore = true)
+    @Mapping(target = "item", ignore = true)
+    @Mapping(target = "created", ignore = true)
+    Comment toEntity(CommentDto commentDto);
+
+    @Named("mapAuthorName")
+    default String mapAuthorName(User author) {
+        if (author == null) {
             return null;
         }
-
-        CommentDto dto = new CommentDto();
-        dto.setId(comment.getId());
-        dto.setText(comment.getText());
-        dto.setCreated(comment.getCreated());
-
-        if (comment.getAuthor() != null) {
-            dto.setAuthorName(comment.getAuthor().getName());
-        }
-
-        return dto;
-    }
-
-    public Comment toEntity(CommentDto commentDto) {
-        if (commentDto == null) {
-            return null;
-        }
-
-        Comment comment = new Comment();
-        comment.setText(commentDto.getText());
-        return comment;
+        return author.getName();
     }
 }
