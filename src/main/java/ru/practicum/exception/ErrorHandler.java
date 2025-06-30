@@ -30,7 +30,7 @@ public class ErrorHandler {
         return new ErrorResponse(exception.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ValidationErrorResponse handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
         List<Violation> violations = exception.getBindingResult().getFieldErrors().stream()
@@ -43,5 +43,11 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleInternalError(Throwable exception) {
         return new ErrorResponse("An unexpected error occurred.");
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handleForbidden(ForbiddenException exception) {
+        return new ErrorResponse(exception.getMessage());
     }
 }

@@ -1,37 +1,27 @@
 package ru.practicum.item;
 
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.item.dto.ItemDto;
+import ru.practicum.user.User;
 
-public class ItemMapper {
-    public static ItemDto toItemDto(Item item) {
-        ItemDto itemDto = new ItemDto();
-        itemDto.setId(item.getId());
-        itemDto.setName(item.getName());
-        itemDto.setDescription(item.getDescription());
-        itemDto.setAvailable(item.getAvailable());
-        itemDto.setRequestId(item.getRequestId());
-        return itemDto;
-    }
+@Mapper(componentModel = "spring")
+public interface ItemMapper {
 
-    public static Item toItem(ItemDto itemDto, Long ownerId) {
-        Item item = new Item();
-        item.setName(itemDto.getName());
-        item.setDescription(itemDto.getDescription());
-        item.setAvailable(itemDto.getAvailable());
-        item.setOwnerId(ownerId);
-        item.setRequestId(itemDto.getRequestId());
-        return item;
-    }
+    @Mapping(target = "lastBooking", ignore = true)
+    @Mapping(target = "nextBooking", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    ItemDto toItemDto(Item item);
 
-    public static void updateItemFromDto(ItemDto itemDto, Item item) {
-        if (itemDto.getName() != null) {
-            item.setName(itemDto.getName());
-        }
-        if (itemDto.getDescription() != null) {
-            item.setDescription(itemDto.getDescription());
-        }
-        if (itemDto.getAvailable() != null) {
-            item.setAvailable(itemDto.getAvailable());
-        }
-    }
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "owner", source = "owner")
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "name", source = "itemDto.name")  // Явное указание источника для name
+    Item toItem(ItemDto itemDto, User owner);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateItemFromDto(ItemDto itemDto, @MappingTarget Item item);
 }
