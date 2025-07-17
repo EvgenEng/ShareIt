@@ -1,22 +1,23 @@
-name: ShareIt API Tests
+name: ShareIt CI
 
-on:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
-  api-tests:
+  build:
     runs-on: ubuntu-latest
-    
+    defaults:
+      run:
+        working-directory: ./ShareIt  # Явное указание рабочей директории
+
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Полный history репозитория
+          path: ShareIt  # Четкое определение пути
 
-      - name: Debug structure
+      - name: Validate structure
         run: |
-          echo "Full structure:"
-          find . -type d
-          echo "Checking modules:"
+          pwd
+          ls -la
           ls -la shareit-gateway/
           ls -la shareit-server/
 
@@ -27,6 +28,4 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: |
-          echo "Current dir: $(pwd)"
-          mvn clean package -DskipTests -B -e -X
+        run: mvn -B package -DskipTests
