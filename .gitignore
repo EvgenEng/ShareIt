@@ -71,7 +71,7 @@ target/
 
 *.xml
 .idea/
-.github/
+
 
 # Бинарные файлы БД
 db/*.db
