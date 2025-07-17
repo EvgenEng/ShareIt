@@ -15,4 +15,3 @@ public class ItemRequestDto {
     private LocalDateTime created;
     private List<ItemResponseDto> items;
 }
-
