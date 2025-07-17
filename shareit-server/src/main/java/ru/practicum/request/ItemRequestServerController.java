@@ -22,7 +22,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/requests")
+@RequestMapping(path = "/server/requests")
 @RequiredArgsConstructor
 public class ItemRequestServerController {
     private final ItemRequestService itemRequestService;
