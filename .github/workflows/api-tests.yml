@@ -5,21 +5,26 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./ShareIt  # Явное указание рабочей директории
-
+    
     steps:
       - uses: actions/checkout@v4
         with:
-          path: ShareIt  # Четкое определение пути
+          fetch-depth: 0  # Полная история репозитория
+
+      - name: Fix potential case issues
+        run: |
+          # Принудительно приводим к строчным буквам
+          [ -d "ShareIt" ] && mv "ShareIt" "shareit" || true
+          [ -d "shareIt" ] && mv "shareIt" "shareit" || true
 
       - name: Validate structure
         run: |
-          pwd
+          echo "Working directory: $(pwd)"
           ls -la
-          ls -la shareit-gateway/
-          ls -la shareit-server/
+          echo "Checking modules..."
+          ls -la shareit-gateway/pom.xml shareit-server/pom.xml
+          [ -f "shareit-gateway/pom.xml" ] || exit 1
+          [ -f "shareit-server/pom.xml" ] || exit 1
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
