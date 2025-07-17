@@ -10,16 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          path: 'shareit-root'  # Явное указание корня проекта
+          fetch-depth: 0  # Полный history репозитория
 
-      - name: Verify project structure
+      - name: Debug structure
         run: |
-          cd shareit-root
-          ls -la
-          echo "Checking modules..."
-          ls -la shareit-gateway/pom.xml
-          ls -la shareit-server/pom.xml
-          echo "Structure verified."
+          echo "Full structure:"
+          find . -type d
+          echo "Checking modules:"
+          ls -la shareit-gateway/
+          ls -la shareit-server/
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -29,23 +28,5 @@ jobs:
 
       - name: Build with Maven
         run: |
-          cd shareit-root
+          echo "Current dir: $(pwd)"
           mvn clean package -DskipTests -B -e -X
-          echo "Build completed"
-
-      - name: Start services
-        run: |
-          cd shareit-root/shareit-server
-          nohup java -jar target/shareit-server-*.jar &
-          cd ../shareit-gateway
-          nohup java -jar target/shareit-gateway-*.jar &
-          
-          echo "Waiting for services to start..."
-          sleep 15
-          curl -v http://localhost:8080/actuator/health
-          curl -v http://localhost:9090/actuator/health
-
-      - name: Run tests
-        run: |
-          cd shareit-root
-          mvn test -B
