@@ -96,6 +96,4 @@ Thumbs.db
 ### Исключения ###
 !**/src/main/**/target/
 !**/src/test/**/target/
-!.mvn/wrapper/maven-wrapper.jar
-
-.github/workflows/api-tests.yml
+!.mvn/wrapper/maven-wrapper.jar.github/workflows/api-tests.yml
