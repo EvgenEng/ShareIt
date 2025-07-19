@@ -16,13 +16,30 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn package -DskipTests
+        run: mvn clean install -DskipTests
+
+      - name: Find and verify JAR file
+        id: find-jar
+        run: |
+          JAR_PATH=$(find shareit-server/target -name "*.jar" | head -n 1)
+          if [ -z "$JAR_PATH" ]; then
+            echo "::error::No JAR file found in shareit-server/target/"
+            ls -R shareit-server/target/
+            exit 1
+          fi
+          echo "JAR_PATH=${JAR_PATH}" >> $GITHUB_ENV
+          echo "Found JAR: ${JAR_PATH}"
 
       - name: Start Spring Boot app
         run: |
-          nohup java -jar target/later-spring-boot-1.0-SNAPSHOT.jar &
+          nohup java -jar $JAR_PATH &
           echo "Waiting for app to start..."
-          timeout 120 bash -c 'while ! curl -s http://localhost:8080/actuator/health >/dev/null; do sleep 1; done'
+          timeout 120 bash -c 'while ! curl -s http://localhost:8080/actuator/health >/dev/null; do sleep 2; done'
+          echo "Application started successfully"
 
       - name: Run API tests
         run: mvn test
+
+      - name: Stop Spring Boot app
+        if: always()
+        run: pkill -f "java.*shareit-server" || true
