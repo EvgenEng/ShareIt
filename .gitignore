@@ -97,3 +97,4 @@ Thumbs.db
 !**/src/main/**/target/
 !**/src/test/**/target/
 !.mvn/wrapper/maven-wrapper.jar.github/workflows/api-tests.yml
+.github/workflows/api-tests.yml
