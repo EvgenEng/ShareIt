@@ -16,30 +16,60 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Maven
-        run: mvn clean install -DskipTests
+        run: mvn clean package -DskipTests
 
-      - name: Find and verify JAR file
-        id: find-jar
+      - name: Find server JAR
+        id: find-server-jar
         run: |
-          JAR_PATH=$(find shareit-server/target -name "*.jar" | head -n 1)
-          if [ -z "$JAR_PATH" ]; then
-            echo "::error::No JAR file found in shareit-server/target/"
+          SERVER_JAR=$(find shareit-server/target -name "*.jar" | head -n 1)
+          if [ -z "$SERVER_JAR" ]; then
+            echo "::error::Server JAR not found!"
             ls -R shareit-server/target/
             exit 1
           fi
-          echo "JAR_PATH=${JAR_PATH}" >> $GITHUB_ENV
-          echo "Found JAR: ${JAR_PATH}"
+          echo "SERVER_JAR=${SERVER_JAR}" >> $GITHUB_ENV
 
-      - name: Start Spring Boot app
+      - name: Find gateway JAR
+        id: find-gateway-jar
         run: |
-          nohup java -jar $JAR_PATH &
-          echo "Waiting for app to start..."
-          timeout 120 bash -c 'while ! curl -s http://localhost:8080/actuator/health >/dev/null; do sleep 2; done'
-          echo "Application started successfully"
+          GATEWAY_JAR=$(find shareit-gateway/target -name "*.jar" | head -n 1)
+          if [ -z "$GATEWAY_JAR" ]; then
+            echo "::error::Gateway JAR not found!"
+            ls -R shareit-gateway/target/
+            exit 1
+          fi
+          echo "GATEWAY_JAR=${GATEWAY_JAR}" >> $GITHUB_ENV
 
-      - name: Run API tests
+      - name: Start services
+        run: |
+          # Запуск сервера на порту 9090
+          nohup java -jar $SERVER_JAR --server.port=9090 > server.log 2>&1 &
+          # Запуск gateway на порту 8080
+          nohup java -jar $GATEWAY_JAR --server.port=8080 > gateway.log 2>&1 &
+          
+          echo "Waiting for services to start..."
+          # Проверяем оба сервиса
+          timeout 180 bash -c '
+            while ! (curl -s http://localhost:8080/actuator/health >/dev/null && 
+                    curl -s http://localhost:9090/actuator/health >/dev/null); do 
+              sleep 3; 
+              echo "Retrying health checks..."; 
+            done'
+          echo "Both services started successfully"
+
+      - name: Run tests
         run: mvn test
 
-      - name: Stop Spring Boot app
+      - name: Show logs if failed
+        if: failure()
+        run: |
+          echo "====== Server Logs ======"
+          cat server.log || echo "No server logs"
+          echo "====== Gateway Logs ======"
+          cat gateway.log || echo "No gateway logs"
+
+      - name: Stop services
         if: always()
-        run: pkill -f "java.*shareit-server" || true
+        run: |
+          pkill -f "shareit-server" || true
+          pkill -f "shareit-gateway" || true
