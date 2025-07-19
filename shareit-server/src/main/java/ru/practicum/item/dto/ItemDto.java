@@ -3,6 +3,7 @@ package ru.practicum.item.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import ru.practicum.booking.dto.BookingShortDto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -23,16 +24,8 @@ public class ItemDto {
     @NotNull(message = "Available status must be specified")
     private Boolean available;
 
-    private BookingShort lastBooking;
-    private BookingShort nextBooking;
+    private BookingShortDto lastBooking;
+    private BookingShortDto nextBooking;
     private List<CommentDto> comments = new ArrayList<>();
     private Long requestId;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class BookingShort {
-        private Long id;
-        private Long bookerId;
-    }
 }

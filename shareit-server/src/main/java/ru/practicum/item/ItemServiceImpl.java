@@ -14,6 +14,7 @@ import ru.practicum.item.dto.CommentDto;
 import ru.practicum.item.dto.ItemDto;
 import ru.practicum.user.User;
 import ru.practicum.user.UserRepository;
+import ru.practicum.booking.dto.BookingShortDto;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -167,20 +168,20 @@ public class ItemServiceImpl implements ItemService {
                 .stream()
                 .findFirst()
                 .ifPresent(booking -> {
-                    ItemDto.BookingShort bookingShort = new ItemDto.BookingShort();
+                    BookingShortDto bookingShort = new BookingShortDto();
                     bookingShort.setId(booking.getId());
                     bookingShort.setBookerId(booking.getBooker().getId());
-                    itemDto.setLastBooking(bookingShort);
+                    itemDto.setLastBooking(new BookingShortDto());
                 });
 
         bookingRepository.findNextBooking(itemId, now)
                 .stream()
                 .findFirst()
                 .ifPresent(booking -> {
-                    ItemDto.BookingShort bookingShort = new ItemDto.BookingShort();
+                    BookingShortDto bookingShort = new BookingShortDto();
                     bookingShort.setId(booking.getId());
                     bookingShort.setBookerId(booking.getBooker().getId());
-                    itemDto.setNextBooking(bookingShort);
+                    itemDto.setNextBooking(new BookingShortDto());
                 });
     }
 

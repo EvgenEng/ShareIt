@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import ru.practicum.booking.Booking;
 import ru.practicum.user.User;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,4 +61,12 @@ public class Item {
         comments.remove(comment);
         comment.setItem(null);
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "last_booking_id")
+    private Booking lastBooking;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "next_booking_id")
+    private Booking nextBooking;
 }
