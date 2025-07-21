@@ -82,7 +82,7 @@ jobs:
             exit
           fi
           echo "Correct branch name '$GITHUB_HEAD_REF' according to the spec, allowed: add-controllers, add-bookings, add-item-requests-and-gateway"
-echo "Исправьте пожалуйста имя ветки '$GITHUB_HEAD_REF' согласно заданию, разрешены: add-controllers, add-bookings, add-item-requests-and-gateway"
+          echo "Исправьте пожалуйста имя ветки '$GITHUB_HEAD_REF' согласно заданию, разрешены: add-controllers, add-bookings, add-item-requests-and-gateway"
           exit -1
         env:
           GH_TOKEN: ${{ github.token }}
@@ -103,9 +103,9 @@ echo "Исправьте пожалуйста имя ветки '$GITHUB_HEAD_RE
             echo "Pull request содержит файл checkstyle.xml, его изменять нельзя. Удалите его из PR"
             exit -2
           fi
-          if [[ "$FILENAMES"  =~ ".class" ]]  [[ "$FILENAMES"  =~ ".jar" ]]  [[ "$FILENAMES"  =~ "mvn" ]] || [[ "$FILENAMES"  =~ ".DS_Store" ]] \
-           [[ "$FILENAMES"  =~ ".idea" ]]  [[ "$FILENAMES"  =~ ".iws" ]]  [[ "$FILENAMES"  =~ ".iml" ]]  [[ "$FILENAMES"  =~ ".ipr" ]] \
-           [[ "$FILENAMES"  =~ ".db" ]]  [[ "$FILENAMES"  =~ ".log" ]] || [[ "$FILENAMES"  =~ "target/" ]]
+          if [[ "$FILENAMES"  =~ ".class" ]] || [[ "$FILENAMES"  =~ ".jar" ]] || [[ "$FILENAMES"  =~ "mvn" ]] || [[ "$FILENAMES"  =~ ".DS_Store" ]] \
+          || [[ "$FILENAMES"  =~ ".idea" ]] || [[ "$FILENAMES"  =~ ".iws" ]] || [[ "$FILENAMES"  =~ ".iml" ]] || [[ "$FILENAMES"  =~ ".ipr" ]] \
+          || [[ "$FILENAMES"  =~ ".db" ]] || [[ "$FILENAMES"  =~ ".log" ]] || [[ "$FILENAMES"  =~ "target/" ]]
           then
             echo "The pull request contains the binary files. Remove them (*.class, *.jar, *.DS_Store ...) from PR"
             echo "Pull request содержит двоичные файлы. Удалите их (*.class, *.jar, *.DS_Store ...) из PR"
@@ -179,7 +179,7 @@ echo "Исправьте пожалуйста имя ветки '$GITHUB_HEAD_RE
             docker compose -f docker-compose.yml logs -f gateway >> ./gateway.log || true
             docker compose -f docker-compose.yml logs -f server >> ./server.log || true
           fi
-  
+
 
       - name: Upload log artifact
         if: ${{ failure() }}
@@ -187,3 +187,10 @@ echo "Исправьте пожалуйста имя ветки '$GITHUB_HEAD_RE
         with:
           name: shareIt_log
           path: ./*.log
+
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        if: ${{ failure() }}
+        with:
+          name: postman_tests_report
+          path: reports
